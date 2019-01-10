@@ -1,0 +1,49 @@
+body {
+    background-image: url(background.jpg);
+        background-size: cover;
+   background-repeat: no-repeat;
+    
+}
+
+
+.newwrapper{
+    max-height: 80%;
+    max-width:80%;
+    
+}
+
+
+.player-0,
+.player-1 {
+    background-color: powderblue;
+    width: 50%;
+    height: 400px;
+    padding: 20px;
+    border: 3px solid black;
+}
+
+.name {
+    font-size: 40px;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+
+}
+
+.this-hand {
+        font-size: 60px;
+    text-align: center;
+    border:3px;
+        border: 2px solid black;
+
+}
+
+.score {
+    text-align: center;
+    font-size: 80px;
+    font-weight: 100;
+    margin-bottom: 130px;
+    border:3px;
+        border: 2px solid black;
+
+}
