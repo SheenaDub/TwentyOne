@@ -1,8 +1,27 @@
 /*eslint-env browser*/
 
-var gameOn, allScores, currentPlayer, cardVal, cardNum, suitNum, suit, alreadyPlayed, cardName, hidden, hiddenCardScore;
 
+
+// to do
+// 1. disable stick and hit buttons if player has not yet clicked 'deal'
+// 2. fix div background so it fills out...
+// 3. fix game logic when it's dealer's turn
+// 4. add 'notification' div to put updates, instead of alerts
+// 5. panel for play buttons
+// 6. add 'title' div at top of page
+// 7. logic to make ace worth 1 or 11, instead of just 11
+
+
+
+var gameOn, allScores, currentPlayer, cardVal, cardNum, suitNum, suit, alreadyPlayed, cardName, hidden, hiddenCardScore, dealerCard1, dealerCard2, playerCard1, playerCard2;
+
+
+var cardSlotNo = 2;
 var dealButton = document.querySelector('.playCard');
+var dealerExtracards=0;
+var playerExtracards=0;
+var dealerSlotNo = 0;
+var playerSlotNo = 0;
 
 
 initialise();
@@ -14,33 +33,32 @@ initialise();
 document.querySelector('.playCard').addEventListener('click', function(){
 
 
-    
 if (gameOn){
     
 // pick four random cards to start        
 var cardElements1 = pickUnplayedCard();
 var cardNum1 = cardElements1[0]; 
-var dealer1 =  cardElements1[1];
+dealerCard1 =  cardElements1[1];
 
 var cardElements2 = pickUnplayedCard();
 var cardNum2 = cardElements2[0]; 
-hidden = cardElements2[1];
+dealerCard2 = cardElements2[1];
 
 var cardElements3 = pickUnplayedCard();
 var cardNum3 = cardElements3[0]; 
-var card3 = cardElements3[1];
+playerCard1 = cardElements3[1];
 
 var cardElements4 = pickUnplayedCard();
 var cardNum4 = cardElements4[0]; 
-var card4 =  cardElements4[1];
+playerCard2 =  cardElements4[1];
 
 
 // display the cards in divs 'card1-' and 'card2-'
-document.getElementById('card1-0').src = "cards/" + dealer1 + ".svg";
+document.getElementById('card1-0').src = "cards/" + dealerCard1 + ".svg";
 document.getElementById('card2-0').src = "cards/upturned.svg";    
 // display the cards in divs 'card1-' and 'card2-'
-document.getElementById('card1-1').src = "cards/" + card3 + ".svg";
-document.getElementById('card2-1').src = "cards/" + card4 + ".svg";
+document.getElementById('card1-1').src = "cards/" + playerCard1 + ".svg";
+document.getElementById('card2-1').src = "cards/" + playerCard2 + ".svg";
     
 
 // add card values to total score
@@ -60,13 +78,18 @@ document.querySelector('#score-1').textContent = allScores[1];
 dealButton.disabled = true;   
     
     
-if (score2===21){    
-alert("You win!!!");
+if (score2===21 && (score1 + hiddenCardScore)!==21){    
+alert("You win!!! Natural blackjack");
+    showDealerCard();
     gameOn=false; 
 }    
     
-//add logic to change current player if turn is over - tbc
-//initialise(); 
+else if  (score2===21 && (score1 + hiddenCardScore)===21){
+ alert("Draw! You and dealer get Natural blackjack");
+    showDealerCard();
+    gameOn=false;
+}
+    
        
 }    
     
@@ -74,9 +97,44 @@ alert("You win!!!");
 })
 
 
+    
+
+function displayNewCard(card){
+    
+    if (currentPlayer===1){
+        playerSlotNo++
+    var playerDiv = document.getElementById('p-1');
+    currentPlayer === 0 ? dealerExtracards++ : playerExtracards++;
+    var slot = document.createElement('img');
+    slot.id = 'playerCardSlot' + playerSlotNo; 
+    slot.style.width = "100px";
+    slot.class = 'newCardImage'; 
+    playerDiv.appendChild(slot);
+    document.getElementById('playerCardSlot' + playerSlotNo).src = "cards/" + card + ".svg";  }
+    
+    else{
+        
+      dealerSlotNo++
+    var playerDiv = document.getElementById('p-0');
+    currentPlayer === 0 ? dealerExtracards++ : playerExtracards++;
+    var slot = document.createElement('img');
+    slot.id = 'dealerCardSlot' + dealerSlotNo; 
+    slot.style.width = "100px";
+    slot.class = 'newCardImage'; 
+    playerDiv.appendChild(slot);
+    document.getElementById('dealerCardSlot' + dealerSlotNo).src = "cards/" + card + ".svg";   
+        
+        
+    }
+    
+    
+    
+    
+    
+}
+
+
 document.querySelector('.hit').addEventListener('click', hit)
-
-
 function hit(){
     
     if (gameOn){   
@@ -84,11 +142,10 @@ function hit(){
 var newCard = pickUnplayedCard();
 var cardNum = newCard[0]; 
 var card = newCard[1];
-//console.log("new card is " + card);
+console.log("new card is " + card);
      
-// display the card - tbc
-//document.getElementById('card1-' + currentPlayer).src = "cards/" + card1 + ".svg";
-    
+displayNewCard(card);       
+        
 // add card values to total score
 var score1 = scorer(cardNum);
 allScores[currentPlayer]+=score1;
@@ -112,16 +169,16 @@ else if (thisScore>21)
     
 }
 
-//function getDealerScore(){
-//    
-//    
-//    
-//}
+// shows hidden dealer card and adds hidden card value to dealer score
+function showDealerCard(){ 
+document.getElementById('card2-0').src = "cards/" + dealerCard2 + ".svg";
+allScores[0]+=hiddenCardScore;    
+document.querySelector('#score-0').textContent = allScores[0];   
+}
 
 
 document.querySelector('.stick').addEventListener('click', function(){
-    
-    
+     
     if (gameOn){ 
         
 // dealer is now the current player        
@@ -135,9 +192,7 @@ var playerFinal = allScores[1];
     
 setTimeout(function(){
 
-document.getElementById('card2-0').src = "cards/" + hidden + ".svg";
-allScores[0]+=hiddenCardScore;    
-document.querySelector('#score-0').textContent = allScores[0];
+showDealerCard();
 
 if (allScores[0]===21){alert("dealer wins!!!");
                    gameOn=false;}
@@ -226,6 +281,9 @@ function pickUnplayedCard(){
 
 }
 
+
+
+
 // work out and return value of card 
 function scorer (cardNum){
     if (cardNum<=10){
@@ -238,12 +296,8 @@ function scorer (cardNum){
 }
 
 function checkPlayed(card){
-    
     var played = (alreadyPlayed.indexOf(card) ===-1) ? false : true;
-    
-    return played;
-    
-}
+    return played;  }
 
 function check21(num){ return num===1 ? true : false; }
 
@@ -252,8 +306,6 @@ function initialise(){
     
 alreadyPlayed=[];
 allScores=[0,0];
-currentPlayer=1;
-score=0; 
 gameOn=true;
     
 document.getElementById('score-0').textContent = '0';
@@ -262,9 +314,46 @@ document.getElementById('card1-0').src = "";
 document.getElementById('card2-0').src = "";
 document.getElementById('card1-1').src = "";
 document.getElementById('card2-1').src = "";
-document.querySelector('.player-1').classList.toggle('current'); 
-document.querySelector('.player-0').classList.toggle('current');  
+document.querySelector('.player-1').classList.remove('current'); 
+document.querySelector('.player-0').classList.remove('current');
+document.querySelector('.player-1').classList.add('current');
 dealButton.disabled = false; 
+   
+if (dealerExtracards>0 || playerExtracards>0){
+    removeCards();
 }
+      
+dealerExtracards=0;
+playerExtracards=0;
+dealerSlotNo = 0;
+playerSlotNo = 0;    
+currentPlayer=1;    
+    
+}// end initialise
 
-
+function removeCards(){
+ 
+    
+if (dealerExtracards>0)    
+{
+    for (var i=1; i<= dealerExtracards; i++){
+    var dealerDiv = document.getElementById('p-0');
+    var element1 = document.getElementById('dealerCardSlot' + i);
+    console.log(element1);
+    dealerDiv.removeChild(element1);  }  
+    
+}
+ 
+    
+if (playerExtracards>0)    
+{
+    for (var j=1; j<= playerExtracards; j++){
+    var playerDiv = document.getElementById('p-1');
+    var element2 = document.getElementById('playerCardSlot' + j);
+    console.log(element2);
+    playerDiv.removeChild(element2);  }  
+    
+}    
+    
+       
+} // end remove function
